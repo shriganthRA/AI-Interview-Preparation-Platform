@@ -11,7 +11,7 @@ const AuthPage = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-
+1
         try {
             if (password === rePassword) {
                 const response = await axios.post(
