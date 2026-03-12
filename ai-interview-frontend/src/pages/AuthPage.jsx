@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import axios from 'axios';
+import {login, register} from '../services/AuthService'
 
 const AuthPage = () => {
-    const [isLogin, setIsLogin] = useState(false);
+    const [isLogin, setIsLogin] = useState(true);
 
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -11,17 +11,10 @@ const AuthPage = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-1
+        
         try {
             if (password === rePassword) {
-                const response = await axios.post(
-                    "",
-                    {
-                        username,
-                        email,
-                        password
-                    }
-                );
+                const response = await register(username, email, password)
 
                 console.log(response.data);
                 alert("Registration successful!");
@@ -34,13 +27,7 @@ const AuthPage = () => {
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post(
-                "",
-                {
-                    email,
-                    password
-                }
-            )
+            const response = await login(email, password)
 
             console.log(response.data);
             alert("Login successful!");
@@ -69,9 +56,9 @@ const AuthPage = () => {
 
             <div className='bg-white border border-none rounded-lg px-8 py-8 text-center shadow-xl'>
                 <h2 className='text-center text-gray-600 font-bold text-2xl mb-8'>Create a New Account</h2>
-                <form onSubmit={isLogin ? handleLogin : handleRegister}>
+                <form onSubmit={isLogin ? handleLogin : handleRegister} className='flex flex-col items-center'>
                     {!isLogin && <input
-                        className='border border-gray-300 rounded-lg w-100 mb-4 p-2'
+                        className='border border-gray-300 rounded-lg w-100 mb-4 p-2 outline-none'
                         type="text"
                         placeholder='Enter your name'
                         value={username}
@@ -81,7 +68,7 @@ const AuthPage = () => {
                     <br />
 
                     <input
-                        className='border border-gray-300 rounded-lg w-100 mb-4 p-2'
+                        className='border border-gray-300 rounded-lg w-100 mb-4 p-2 outline-none'
                         type="email"
                         placeholder='Enter your email'
                         value={email}
@@ -91,7 +78,7 @@ const AuthPage = () => {
                     <br />
 
                     <input
-                        className='border border-gray-300 rounded-lg w-100 mb-4 p-2'
+                        className='border border-gray-300 rounded-lg w-100 mb-4 p-2 outline-none'
                         type="password"
                         placeholder='Enter your password'
                         value={password}
@@ -101,25 +88,33 @@ const AuthPage = () => {
                     <br />
 
                     {!isLogin && <input
-                        className='border border-gray-300 rounded-lg w-100 mb-6 p-2'
+                        className='border border-gray-300 rounded-lg w-100 p-2 outline-none'
                         type="password"
                         placeholder='Confirm your password'
                         value={rePassword}
                         onChange={(e) => setRepassword(e.target.value)}
                     />}
 
-                    <br />
+                    
+                    {isLogin && <p className='ms-auto me-4'><a href="" className='font-medium text-blue-600'>Forgot password?</a></p>}
+                
 
-                    <button className='w-110 bg-blue-600 text-white font-bold text-lg py-2 mb-4 cursor-pointer rounded-lg' type='submit' onClick={() => setIsLogin(!isLogin)}>{!isLogin ? "Register" : "Login"}</button>
+                    <button className='mt-4 w-110 bg-blue-600 text-white font-bold text-lg py-2 mb-4 cursor-pointer rounded-lg' type='submit' onClick={() => setIsLogin(!isLogin)}>{!isLogin ? "Register" : "Login"}</button>
 
                 </form>
 
                 {!isLogin ? (
                     <p>
-                        Already have an account? <a href="" className='font-medium text-blue-600' onClick={setIsLogin(!isLogin)}>Login</a>
+                        Already have an account? <a href="" className='font-medium text-blue-600' onClick={(e) => {
+                            e.preventDefault();
+                            setIsLogin(!isLogin);
+                        }}>Login</a>
                     </p>) : (
                     <p>
-                        Don't you have an account? <a href="" className='font-medium text-blue-600' onClick={setIsLogin(!isLogin)}>Register</a>
+                        Don't you have an account? <a href="" className='font-medium text-blue-600' onClick={(e) => {
+                            e.preventDefault();
+                            setIsLogin(!isLogin);
+                        }}>Register</a>
                     </p>)
                 }
             </div>
