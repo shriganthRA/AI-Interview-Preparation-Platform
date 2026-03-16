@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import {login, register} from '../services/AuthService'
+import React, { useEffect, useState } from 'react'
+import { login, register } from '../services/AuthService'
 
 const AuthPage = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -9,25 +9,57 @@ const AuthPage = () => {
     const [password, setPassword] = useState("");
     const [rePassword, setRepassword] = useState("");
 
+    useEffect(() => {
+
+        if(isLogin) {
+            document.title = "login";
+        } else {
+            document.title = "register";
+        }
+        
+    }, [isLogin])
+
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            console.log("Running...");
+        }, 1000);
+
+        return(() => {
+            clearInterval(timer)
+            // timer
+        })
+    }, [])
+
     const handleRegister = async (e) => {
         e.preventDefault();
-        
-        try {
-            if (password === rePassword) {
-                const response = await register(username, email, password)
 
-                console.log(response.data);
-                alert("Registration successful!");
+        try {
+            if (password !== rePassword) {
+                alert("Passwords do not match");
+                return;
             }
+
+            const response = await register({ name: username, email, password })
+
+            console.log(response.data);
+            alert("Registration successful!");
         } catch (error) {
             console.error(error);
             alert("Registration failed!");
         }
     }
 
-    const handleLogin = async () => {
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
         try {
-            const response = await login(email, password)
+            const response = await login({ email, password })
+
+            // Save token
+            localStorage.setItem("accessToken", response.accessToken);
+            localStorage.setItem("refreshToken", response.refreshToken);
+            localStorage.setItem("email", response.email);
 
             console.log(response.data);
             alert("Login successful!");
@@ -95,11 +127,11 @@ const AuthPage = () => {
                         onChange={(e) => setRepassword(e.target.value)}
                     />}
 
-                    
-                    {isLogin && <p className='ms-auto me-4'><a href="" className='font-medium text-blue-600'>Forgot password?</a></p>}
-                
 
-                    <button className='mt-4 w-110 bg-blue-600 text-white font-bold text-lg py-2 mb-4 cursor-pointer rounded-lg' type='submit' onClick={() => setIsLogin(!isLogin)}>{!isLogin ? "Register" : "Login"}</button>
+                    {isLogin && <p className='ms-auto me-4'><a href="" className='font-medium text-blue-600'>Forgot password?</a></p>}
+
+
+                    <button className='mt-4 w-110 bg-blue-600 text-white font-bold text-lg py-2 mb-4 cursor-pointer rounded-lg' type='submit'>{!isLogin ? "Register" : "Login"}</button>
 
                 </form>
 

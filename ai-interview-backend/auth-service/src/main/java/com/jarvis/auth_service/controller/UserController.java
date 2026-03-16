@@ -11,6 +11,7 @@ import com.jarvis.auth_service.dto.LoginRequestDTO;
 import com.jarvis.auth_service.dto.RegisterRequestDTO;
 import com.jarvis.auth_service.service.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,6 +34,14 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO request) {
         AuthResponseDTO response = userService.login(request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Logout API
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String response = userService.logout(request);
 
         return ResponseEntity.ok(response);
     }

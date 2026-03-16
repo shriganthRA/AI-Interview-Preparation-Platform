@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.jarvis.auth_service.service.TokenBlacklistService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +25,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
+
 
     // Extract the token from request
     private String getTokenFromRequest(HttpServletRequest request) {
@@ -39,12 +43,19 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        // Check the request has starts with "/auth"
         if (request.getServletPath().startsWith("/auth")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = getTokenFromRequest(request);
+
+        // Check the token is blacklisted or not
+        if (tokenBlacklistService.isBlacklisted(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (token != null) {
             String username = jwtService.extractEmail(token);

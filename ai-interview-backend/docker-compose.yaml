@@ -1,0 +1,18 @@
+
+
+services:
+  auth-db:
+    image: postgres:17
+    container_name: auth-service-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: authdb
+    ports:
+      - 5433:5432
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+
+
+volumes:
+  auth-db-data:

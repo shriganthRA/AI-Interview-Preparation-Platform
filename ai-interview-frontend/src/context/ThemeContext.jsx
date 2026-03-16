@@ -24,4 +24,4 @@ const ThemeProvider = ({ children }) => {
     )
 }
 
-export default ThemeContext
+export default ThemeProvider

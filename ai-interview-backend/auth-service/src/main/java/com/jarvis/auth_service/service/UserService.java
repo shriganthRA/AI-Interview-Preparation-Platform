@@ -13,16 +13,19 @@ import com.jarvis.auth_service.dto.RegisterRequestDTO;
 import com.jarvis.auth_service.entity.User;
 import com.jarvis.auth_service.repository.UserRepo;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    private final TokenBlacklistService tokenBlacklistService;
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RedisTokenService redisTokenService;
+
 
     // Register User
     public String register(RegisterRequestDTO request) {
@@ -68,5 +71,20 @@ public class UserService {
 
         return new AuthResponseDTO(newAccessToken, refreshTokenRequestDTO.getRefreshToken(),
                 refreshTokenRequestDTO.getEmail());
+    }
+
+    // Logout User
+    public String logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+
+            long expiration = jwtService.extractExpiration(authHeader).getTime() - System.currentTimeMillis();
+
+            tokenBlacklistService.blacklistToken(token, expiration);
+        }
+
+        return "Logged out successfully";
     }
 }
